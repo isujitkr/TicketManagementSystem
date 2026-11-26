@@ -10,6 +10,7 @@ const {
   authorizeRoles,
 } = require("../middlewares/auth.middleware");
 const { ROLES } = require("../constants");
+const { getComments, addComment } = require("../controllers/comment.controller");
 
 const router = express.Router();
 
@@ -19,5 +20,8 @@ router.post("/", authorizeRoles(ROLES.USER), createTicket);
 router.get("/", authorizeRoles(ROLES.USER), listTickets);
 router.get("/:id", getTicketDetails);
 router.patch("/:id", authorizeRoles(ROLES.USER), updateOwnTicket);
+
+router.post("/:id/comments", addComment)
+router.get("/:id/comments", getComments)
 
 module.exports = router;
