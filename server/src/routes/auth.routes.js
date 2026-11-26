@@ -6,7 +6,7 @@ const {
   getMe,
 } = require("../controllers/auth.controller");
 const { authLimiter } = require("../middlewares/rateLimit.middleware");
-const isAuthenticated = require("../middlewares/auth.middleware");
+const { isAuthenticated } = require("../middlewares/auth.middleware");
 
 const router = express.Router();
 
