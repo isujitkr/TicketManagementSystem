@@ -1,5 +1,10 @@
 const express = require("express");
-const { createTicket } = require("../controllers/Ticket.controller");
+const {
+  createTicket,
+  listTickets,
+  getTicketDetails,
+  updateOwnTicket,
+} = require("../controllers/Ticket.controller");
 const {
   isAuthenticated,
   authorizeRoles,
@@ -11,5 +16,8 @@ const router = express.Router();
 router.use(isAuthenticated);
 
 router.post("/", authorizeRoles(ROLES.USER), createTicket);
+router.get("/", authorizeRoles(ROLES.USER), listTickets);
+router.get("/:id", getTicketDetails);
+router.patch("/:id", authorizeRoles(ROLES.USER), updateOwnTicket);
 
 module.exports = router;

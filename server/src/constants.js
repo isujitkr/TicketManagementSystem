@@ -32,6 +32,15 @@ const PRIORITY_WEIGHT = {
   urgent: 4,
 };
 
+const EVENTS = {
+  TICKET_CREATED: 'ticket.created',
+  TICKET_UPDATED: 'ticket.updated',
+  TICKET_DELETED: 'ticket.deleted',
+  STATUS_CHANGED: 'ticket.status_changed',
+  COMMENT_ADDED: 'comment.added',
+  TICKET_RESOLVED: 'ticket.resolved',
+};
+
 const ROLE_LIST = Object.values(ROLES);
 const STATUS_LIST = Object.values(TICKET_STATUS);
 const PRIORITY_LIST = Object.values(TICKET_PRIORITY);
@@ -47,4 +56,5 @@ module.exports = {
   TICKET_CATEGORY,
   TICKET_PRIORITY,
   TICKET_STATUS,
+  EVENTS
 };
