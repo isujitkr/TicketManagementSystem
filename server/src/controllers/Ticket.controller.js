@@ -1,3 +1,4 @@
+const { Error } = require("mongoose");
 const {
   EVENTS,
   STATUS_LIST,
@@ -19,19 +20,17 @@ const getAccessibleTicket = async (ticketId, user) => {
   );
 
   if (!ticket) {
-    return res.status(404).json({
-      success: false,
-      message: "Ticket not found",
-    });
+    const error = new Error("Ticket not found");
+    error.statusCode = 404;
+    throw error;
   }
 
   const isOwner = ticket.createdBy._id.toString() === user._id.toString();
 
   if (user.role !== ROLES.ADMIN && !isOwner) {
-    return res.status(404).json({
-      success: false,
-      message: "Ticket not found",
-    });
+    const error = new Error("Ticket not found");
+    error.statusCode = 404;
+    throw error;
   }
 
   return ticket;
@@ -138,6 +137,26 @@ const listTickets = async (req, res) => {
     const sortField = sortBy === "priority" ? "priorityWeight" : sortBy;
     const sort = { [sortField]: order === "asc" ? 1 : -1, _id: -1 };
 
+    if (req.user.role === ROLES.USER) {
+      query.createdBy = req.user._id;
+    } else if (req.user.role === ROLES.ADMIN) {
+      if (createdBy) {
+        if (!mongoose.Types.ObjectId.isValid(createdBy)) {
+          return res.status(400).json({
+            success: false,
+            message: "Invalid user ID",
+          });
+        }
+
+        query.createdBy = createdBy;
+      }
+    } else {
+      return res.status(403).json({
+        success: false,
+        message: "Access denied",
+      });
+    }
+
     const [items, total] = await Promise.all([
       Ticket.find(query)
         .sort(sort)
@@ -175,7 +194,7 @@ const getTicketDetails = async (req, res) => {
       data: ticket,
     });
   } catch (error) {
-    return res.status(500).json({
+    return res.status(error.statusCode || 500).json({
       success: false,
       message: error.message,
     });
@@ -238,7 +257,7 @@ const updateOwnTicket = async (req, res) => {
       data: ticket,
     });
   } catch (error) {
-    return res.status(500).json({
+    return res.status(error.statusCode || 500).json({
       success: false,
       message: error.message,
     });
