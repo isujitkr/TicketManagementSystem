@@ -10,7 +10,7 @@ const signToken = (user) => {
 const cookieOptions = {
   httpOnly: true,
   secure: true,
-  sameSite: "strict",
+  sameSite: "none",
   maxAge: 3 * 24 * 60 * 60 * 1000,
 };
 
