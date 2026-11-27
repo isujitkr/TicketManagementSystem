@@ -1,9 +1,12 @@
 const express = require("express");
 const routes = require("./routes/index");
 const cookieParser = require("cookie-parser");
+const cors = require('cors');
 const { apiLimiter } = require("../src/middlewares/rateLimit.middleware");
 
 const app = express();
+
+app.use(cors({ origin: process.env.CLIENT_URL, credentials: true })); 
 
 app.use(express.json({ limit: "10kb" }));
 app.use(cookieParser());
