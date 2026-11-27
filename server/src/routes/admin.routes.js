@@ -9,6 +9,7 @@ const {
   updateTicketByAdmin,
   deleteTicket,
   stats,
+  activityFeed,
 } = require("../controllers/admin.controller");
 const { listTickets } = require("../controllers/Ticket.controller");
 
@@ -21,5 +22,6 @@ router.get("/tickets", listTickets);
 router.patch("/tickets/:id", updateTicketByAdmin);
 router.delete("/tickets/:id", deleteTicket);
 router.get("/stats", stats);
+router.get("/activity", activityFeed)
 
 module.exports = router;

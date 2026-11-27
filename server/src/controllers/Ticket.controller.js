@@ -10,6 +10,7 @@ const {
 const { publish } = require("../events/emitter");
 const Ticket = require("../models/Ticket");
 const buildPagination = require("../utils/helper");
+const ActivityLog = require("../models/ActivityLog");
 
 const USER_EDITABLE_FIELDS = ["title", "description", "category", "priority"];
 
@@ -264,10 +265,35 @@ const updateOwnTicket = async (req, res) => {
   }
 };
 
+const singleTicketActivity = async (req, res) => {
+  try {
+    const ticketId = req.params.id;
+    const user = req.user;
+    
+    const ticket = await getAccessibleTicket(ticketId, user);
+    
+    const activity = await ActivityLog.find({ ticket: ticket._id })
+      .sort({ createdAt: -1 })
+      .limit(100)
+      .lean();
+
+    return res.status(200).json({
+      success: true,
+      data: activity,
+    });
+  } catch (error) {
+    return res.status(error.statusCode || 500).json({
+      success: false,
+      message: error.message
+    })
+  }
+};
+
 module.exports = {
   createTicket,
   listTickets,
   getTicketDetails,
   updateOwnTicket,
   getAccessibleTicket,
+  singleTicketActivity
 };

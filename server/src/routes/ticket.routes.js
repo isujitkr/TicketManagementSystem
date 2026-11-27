@@ -4,6 +4,7 @@ const {
   listTickets,
   getTicketDetails,
   updateOwnTicket,
+  singleTicketActivity,
 } = require("../controllers/Ticket.controller");
 const {
   isAuthenticated,
@@ -25,6 +26,7 @@ router.get("/", authorizeRoles(ROLES.USER), listTickets);
 router.get("/:id", getTicketDetails);
 router.patch("/:id", authorizeRoles(ROLES.USER), updateOwnTicket);
 router.delete("/:id", authorizeRoles(ROLES.USER), deleteTicket);
+router.get("/:id/activity", authorizeRoles(ROLES.USER), singleTicketActivity);
 
 router.post("/:id/comments", addComment);
 router.get("/:id/comments", getComments);

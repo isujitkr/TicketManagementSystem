@@ -1,10 +1,18 @@
 const { default: mongoose } = require("mongoose");
-const { ROLES, EVENTS, TICKET_STATUS, STATUS_LIST, PRIORITY_LIST } = require("../constants");
+const {
+  ROLES,
+  EVENTS,
+  TICKET_STATUS,
+  STATUS_LIST,
+  PRIORITY_LIST,
+} = require("../constants");
 const { publish } = require("../events/emitter");
 const Comment = require("../models/Comment");
 const Ticket = require("../models/Ticket");
 const User = require("../models/User");
 const { getAccessibleTicket } = require("./Ticket.controller");
+const buildPagination = require("../utils/helper");
+const ActivityLog = require("../models/ActivityLog");
 
 const getAllUsers = async (req, res) => {
   try {
@@ -186,4 +194,35 @@ const stats = async (req, res) => {
   });
 };
 
-module.exports = { getAllUsers, updateTicketByAdmin, deleteTicket, stats };
+const activityFeed = async (req, res) => {
+  try {
+    const { page = 1, limit = 10 } = req.query;
+    const [items, total] = await Promise.all([
+      ActivityLog.find()
+        .sort({ createdAt: -1 })
+        .skip((page - 1) * limit)
+        .limit(limit)
+        .lean(),
+      ActivityLog.countDocuments(),
+    ]);
+
+    return res.status(200).json({
+      success: true,
+      data: items,
+      pagination: buildPagination({ page, limit, total }),
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+module.exports = {
+  getAllUsers,
+  updateTicketByAdmin,
+  deleteTicket,
+  stats,
+  activityFeed,
+};
