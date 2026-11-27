@@ -13,6 +13,7 @@ const buildPagination = require("../utils/helper");
 const ActivityLog = require("../models/ActivityLog");
 
 const USER_EDITABLE_FIELDS = ["title", "description", "category", "priority"];
+const escapeRegex = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
 const getAccessibleTicket = async (ticketId, user) => {
   const ticket = await Ticket.findById(ticketId).populate(
@@ -101,6 +102,7 @@ const listTickets = async (req, res) => {
       limit = 10,
       sortBy = "createdAt",
       order = "desc",
+      q,
       status,
       priority,
       category,
@@ -134,6 +136,10 @@ const listTickets = async (req, res) => {
     if (priority) query.priority = priority;
     if (category) query.category = category;
     if (createdBy) query.createdBy = createdBy;
+    if (q) {
+    const rx = new RegExp(escapeRegex(q), 'i');
+    query.$or = [{ title: rx }, { description: rx }];
+  }
 
     const sortField = sortBy === "priority" ? "priorityWeight" : sortBy;
     const sort = { [sortField]: order === "asc" ? 1 : -1, _id: -1 };
